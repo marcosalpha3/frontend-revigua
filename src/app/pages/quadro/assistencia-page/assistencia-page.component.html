@@ -1,0 +1,115 @@
+<div class="uk-container uk-container-small uk-margin-top">
+  <nav class="uk-navbar-container" uk-navbar>
+    <div class="uk-navbar-left">
+      <ul class="uk-navbar-nav uk-margin-bottom">
+        <li class="uk-active">ASSISTÊNCIAS</li>
+      </ul>
+    </div>
+    <div class="uk-navbar-right" *ngIf="!busy">
+      <ul class="uk-navbar-nav">
+        <li *ngIf="(user?.admin || user?.assistance)  && !busy" class="uk-active"><a href="#modal-atualizar" uk-toggle><span
+              class="uk-icon uk-margin-small-right" uk-icon="icon: plus"></span>
+            Adicionar</a></li>
+            <li class="uk-active"><a [routerLink]="['/grafico']">
+              <span class="uk-icon uk-margin-small-right" uk-icon="icon: image; ratio: 1.4"></span>
+              Grafico
+          </a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <app-loading *ngIf="busy"></app-loading>
+
+  <form [formGroup]="formConsult" class="uk-grid-small" uk-grid *ngIf="!busy">
+    <div class="uk-width-1-2@s">
+      <label class="uk-form-label" for="form-horizontal-text">Data Inicial: </label>
+      <my-date-picker id="datainicial" name="datainicial" [options]="myDatePickerOptions" formControlName="datainicial"
+        placeholder="Data Inicial"
+        [ngClass]="{'uk-form-danger': (!formConsult.controls.datainicial.valid && !formConsult.controls.datainicial.pristine)}"
+        (dateChanged)="onDateChangedInitial($event)">
+      </my-date-picker>
+    </div>
+
+    <div class="uk-width-1-2@s">
+      <label class="uk-form-label" for="form-horizontal-text">Data Final: </label>
+      <my-date-picker id="datafinal" name="datafinal" [options]="myDatePickerOptions" formControlName="datafinal"
+        placeholder="Data Final"
+        [ngClass]="{'uk-form-danger': (!formConsult.controls.datafinal.valid && !formConsult.controls.datafinal.pristine)}"
+        (dateChanged)="onDateChangedFinal($event)">
+      </my-date-picker>
+    </div>
+  </form>
+
+
+  <div class="uk-background-default uk-overflow-auto uk-margin-top" *ngIf="!busy">
+    <table class="uk-table uk-table-large uk-table-striped">
+      <thead class="uk-heading-divider">
+        <tr>
+          <th><span class="uk-text-bold">Data</span></th>
+          <th><span class="uk-text-bold">Dia Semana</span></th>
+          <th><span class="uk-text-bold">Assistência</span></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let detalhe of assistencias">
+          <td>
+            {{ detalhe.data | date: 'dd/MM/yyyy' }}
+          </td>
+          <td>
+            {{ detalhe.diaSemana }}
+          </td>
+          <td>
+            {{ detalhe.assistenciaParte1 }} 
+          </td>
+          <td>
+              <a *ngIf="(user?.admin)" class="uk-button uk-button-link uk-align-right">
+                  <span class="uk-icon" uk-icon="icon: trash" (click)="delete(detalhe.data)"></span>
+              </a>      
+
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div id="modal-atualizar" uk-modal>
+    <div class="uk-modal-dialog">
+      <button class="uk-modal-close-default" type="button" uk-close></button>
+      <div class="uk-modal-header">
+        <h1 class="uk-modal-title"> Informar Assistência: </h1>
+      </div>
+
+      <form [formGroup]="form" *ngIf="!busy">
+        <div class="uk-card uk-card-small uk-card-body uk-box-shadow-small uk-margin">
+
+          <div class="uk-form-danger" *ngIf="errors.length > 0">
+            <h4 class="uk-text-center" id="msgRetorno"> Opa! Alguma coisa não deu certo:</h4>
+            <ul>
+              <li *ngFor="let error of errors">{{ error.message }}</li>
+            </ul>
+          </div>
+
+          <div class="uk-margin">
+            <my-date-picker id="data" name="data" [options]="myDatePickerOptions" formControlName="data"
+              placeholder="Data"
+              [ngClass]="{'uk-form-danger': (!form.controls.data.valid && !form.controls.data.pristine)}">
+            </my-date-picker>
+          </div>
+
+          <div class="uk-margin">
+            <input class="uk-input" formControlName="assistenciaParte1" type="number" placeholder="Assistência Reunião"
+              [ngClass]="{'uk-form-danger': (!form.controls.assistenciaParte1.valid && !form.controls.assistenciaParte1.pristine) }">
+          </div>
+
+        </div>
+        <div class="uk-modal-footer uk-text-right">
+          <button class="uk-button uk-button-secondary uk-modal-close" type="button">Voltar</button>
+          <button (click)="submit()" class="uk-button uk-button-primary uk-modal-close" type="button"
+            [disabled]="form.invalid">Ok</button>
+        </div>
+
+      </form>
+    </div>
+
+
+  </div>

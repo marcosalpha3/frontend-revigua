@@ -1,0 +1,95 @@
+<div class="uk-container uk-container-small uk-margin-top">
+
+  <nav class="uk-navbar-container" uk-navbar>
+    <div class="uk-navbar-left">
+      <ul class="uk-navbar-nav uk-margin-bottom">
+        <li class="uk-active">EXCEÇÕES DE DESIGNAÇÕES MECÂNICAS</li>
+      </ul>
+    </div>
+    <div class="uk-navbar-right" *ngIf="!busy && mode=='list'">
+      <ul class="uk-navbar-nav">
+        <li class="uk-active"><a (click)="changeMode('add')">
+            <span class="uk-icon uk-margin-small-right" uk-icon="icon: plus"></span>
+            Adicionar
+          </a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <app-loading *ngIf="busy"></app-loading>
+
+  <div class="uk-overflow-auto uk-margin-top" *ngIf="mode=='list' && !busy">
+    <table class="uk-table uk-table-large uk-table-divider">
+      <thead class="uk-heading-divider">
+        <tr>
+          <th><span class="uk-text-bold">Data</span></th>
+          <th><span class="uk-text-bold">Irmão</span></th>
+          <th><span class="uk-text-bold">Motivo</span></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let detalhe of excecoes">
+          <td>
+            {{ detalhe.data | date: 'dd/MM/yyyy' }}
+          </td>
+          <td>
+            {{ detalhe.irmaoNome }}
+          </td>
+          <td>
+            {{ detalhe.motivo }}
+          </td>
+          <td>
+            <a class="uk-button uk-button-link uk-align-right">
+              <span class="uk-icon" uk-icon="icon: trash" (click)="delete(detalhe.codigo)"></span>
+            </a>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="uk-width-1-2@m uk-margin">
+    <form [formGroup]="form" *ngIf="!busy && mode!='list'">
+      <div class="uk-card uk-card-primary uk-card-body uk-box-shadow-small uk-margin">
+        <div class="uk-form-danger" *ngIf="errors.length > 0">
+          <h4 class="uk-text-center" id="msgRetorno"> Opa! Alguma coisa não deu certo:</h4>
+          <ul>
+            <li *ngFor="let error of errors">{{ error.message }}</li>
+          </ul>
+        </div>
+
+        <div class="uk-margin">
+          <my-date-picker id="data" name="data" [options]="myDatePickerOptions" formControlName="data"
+            placeholder="Data"
+            [ngClass]="{'uk-form-danger': (!form.controls.data.valid && !form.controls.data.pristine)}">
+          </my-date-picker>
+        </div>
+
+        <div class="uk-margin">
+          <div uk-form-custom="target: > * > span:first-child" class="uk-select uk-form-large">
+            <select formControlName="irmaoId" [ngClass]="{'uk-form-danger': (!form.controls.irmaoId.valid) }">
+              <option value="">Selecione o Irmão...</option>
+              <option *ngFor="let irmao of irmaos" value="{{irmao.codigo}}">{{ irmao.nome }}</option>
+            </select>
+            <button class="uk-button uk-button-default" type="button">
+              <span></span>
+              <span uk-icon="icon: users"></span>
+            </button>
+          </div>
+        </div>
+
+        <div class="uk-margin">
+          <input class="uk-input uk-form-form-medium" formControlName="motivo" type="text" placeholder="Motivo"
+            [ngClass]="{'uk-form-danger': (!form.controls.motivo.valid && !form.controls.motivo.pristine) }">
+        </div>
+
+        <div class="uk-margin uk-text-right">
+          <button class="uk-button uk-button-default" [disabled]="form.invalid" (click)="submit()">Salvar</button>
+        </div>
+
+        <p class="uk-text-center">
+          <button (click)="changeMode('list')" class="uk-button uk-button-link">Cancelar</button>
+        </p>
+      </div>
+    </form>
+  </div>
+</div>

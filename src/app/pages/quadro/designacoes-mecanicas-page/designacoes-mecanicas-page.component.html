@@ -1,0 +1,67 @@
+<div class="uk-container uk-container-expand uk-margin-top">
+    <nav class="uk-navbar-container" uk-navbar>
+        <div class="uk-navbar-left">
+            <ul class="uk-navbar-nav uk-margin-bottom">
+                <li class="uk-active">DESIGNAÇÕES MECÂNICAS</li>
+            </ul>
+        </div>
+        <div class="uk-navbar-right" *ngIf="!busy">
+            <ul class="uk-navbar-nav">
+                <li class="uk-active"><a href="/">
+                        <span class="uk-icon uk-margin-small-right" uk-icon="icon: thumbnails; ratio: 1.4"></span>
+                        Voltar ao Quadro
+                    </a></li>
+
+                <li *ngIf="user?.admin" class="uk-active"><a [routerLink]="['/excecao']"><span
+                            class="uk-icon uk-margin-small-right" uk-icon="icon: warning"></span>
+                        Exceções</a></li>
+
+            </ul>
+        </div>
+    </nav>
+
+    <app-loading *ngIf="busy"></app-loading>
+    <div class="uk-overflow-auto" *ngIf="!busy">
+        <table class="uk-table uk-table-small uk-table-divider">
+            <thead class="uk-heading-divider">
+                <tr>
+                    <th><span class="uk-text-bold">Data</span></th>
+                    <th><span class="uk-text-bold">Indicadores</span></th>
+                    <th><span class="uk-text-bold">Microfonistas</span></th>
+                    <th><span class="uk-text-bold">Som e Video</span></th>
+                    <th><span class="uk-text-bold">Leitor</span></th>
+                    <th *ngIf="user?.exibirOracaoInicial"><span class="uk-text-bold">Oração Inicial</span></th>
+                    <th><span class="uk-text-bold">Oração Final</span></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let designacao of designacoes">
+                    <td>
+                        {{ designacao.dataFormatada }}
+                    </td>
+                    <td *ngIf="designacao.evento != 'Assembleia'">
+                <tr *ngFor="let indicador of designacao.indicadores">
+                    <td>{{ indicador }}</td>
+                </tr>
+                </td>
+                <td>
+                    <tr *ngFor="let microfonista of designacao.microfonistas">
+                        <td>{{ microfonista }}</td>
+                    </tr>
+                </td>
+                <td>
+                    <tr *ngFor="let som of designacao.somVideo">
+                        <td>{{ som }}</td>
+                    </tr>
+                </td>
+                <td>{{ designacao.leitor }}
+                    <span class="uk-align-left uk-text-bold" *ngIf="designacao.evento != null">{{ designacao.evento
+                        }}</span>
+                </td>
+                <td *ngIf="user?.exibirOracaoInicial">{{ designacao.oracaoInicial }}</td>
+                <td>{{ designacao.oracaoFinal }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

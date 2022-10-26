@@ -1,0 +1,207 @@
+<div class="uk-container">
+  <div class="uk-margin">
+
+    <nav class="uk-navbar-container uk-margin-top uk-margin-bottom" uk-navbar>
+      <div class="uk-navbar-left ">
+        <ul class="uk-navbar-nav">
+          <li class="uk-active">CADASTRO IRMÃOS</li>
+        </ul>
+      </div>
+      <div class="uk-navbar-right">
+        <ul class="uk-navbar-nav">
+          <li class="uk-active" *ngIf="!busy && mode=='list'"><a (click)="changeMode('add')">
+              <span class="uk-icon uk-margin-small-right" uk-icon="icon: plus"></span>
+              Adicionar
+            </a></li>
+
+          <li class="uk-active" *ngIf="!busy && user?.admin  && mode=='list'"><a (click)="regenerateBoardList()">
+              <span class="uk-icon uk-margin-small-right" uk-icon="icon: future"></span>
+              Atualizar Desig.
+            </a></li>
+        </ul>
+      </div>
+    </nav>
+
+    <app-loading *ngIf="busy"></app-loading>
+
+   
+    <div class="uk-background-default uk-overflow-auto uk-margin-top" *ngIf="mode=='list' && !busy">
+      <table class="uk-table uk-table-large uk-table-striped">
+        <thead class="uk-heading-divider">
+          <tr>
+            <th><span class="uk-text-bold">Irmao</span></th>
+            <th><span class="uk-text-bold">Editar</span></th>                         
+            <th><span class="uk-text-bold">Bloquear</span></th>                         
+            <th><span class="uk-text-bold">Leitor Sent.</span></th>
+            <th><span class="uk-text-bold">Leitor Est.</span></th>
+            <th><span class="uk-text-bold">Sist. Sonoro</span></th>                                    
+            <th><span class="uk-text-bold">Indicador</span></th>            
+            <th><span class="uk-text-bold">Microfone</span></th>                        
+            <th><span class="uk-text-bold">Oração</span></th>             
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let irmao of irmaos">
+            <td>
+              {{ irmao.nome }} 
+            </td>
+
+            <td>
+              <a *ngIf="irmao.ativo" class="uk-button uk-button-link uk-align-left">
+                <span class="uk-icon" uk-icon="icon: pencil" (click)="edit(irmao)"></span>
+              </a>     
+            </td>
+
+            <td>
+              <a *ngIf="irmao.ativo" class="uk-button uk-button-link uk-align-left">
+                <span class="uk-icon" uk-icon="icon: lock" (click)="desactivate(irmao.codigo)"></span>
+              </a>       
+              <a *ngIf="!irmao.ativo" class="uk-button uk-button-link uk-align-left">
+                <span class="uk-icon" uk-icon="icon: unlock" (click)="activate(irmao.codigo)"></span>
+              </a>     
+            </td>
+
+            <td>
+              <span *ngIf="irmao.leitorSentinela" class="uk-icon" uk-icon="icon: check"></span>
+              <span *ngIf="!irmao.leitorSentinela" class="uk-icon" uk-icon="icon: ban"></span>              
+            </td>
+
+            <td>
+              <span *ngIf="irmao.leitorEstudoLivro" class="uk-icon" uk-icon="icon: check"></span>
+              <span *ngIf="!irmao.leitorEstudoLivro" class="uk-icon" uk-icon="icon: ban"></span>              
+            </td>
+
+            <td>
+              <span *ngIf="irmao.sistemaSonoro" class="uk-icon" uk-icon="icon: check"></span>
+              <span *ngIf="!irmao.sistemaSonoro" class="uk-icon" uk-icon="icon: ban"></span>              
+            </td>
+
+            <td>
+              <span *ngIf="irmao.indicador" class="uk-icon" uk-icon="icon: check"></span>
+              <span *ngIf="!irmao.indicador" class="uk-icon" uk-icon="icon: ban"></span>              
+            </td>
+
+            <td>
+              <span *ngIf="irmao.microfonista" class="uk-icon" uk-icon="icon: check"></span>
+              <span *ngIf="!irmao.microfonista" class="uk-icon" uk-icon="icon: ban"></span>              
+            </td>
+
+            <td>
+              <span *ngIf="irmao.oracaoFinal" class="uk-icon" uk-icon="icon: check"></span>
+              <span *ngIf="!irmao.oracaoFinal" class="uk-icon" uk-icon="icon: ban"></span>              
+            </td>
+
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <form [formGroup]="form" *ngIf="!busy && mode!='list'">
+      <div class="uk-card uk-card-primary uk-card-body uk-box-shadow-small uk-margin">
+
+        <div class="uk-form-danger" *ngIf="errors.length > 0">
+          <h4 class="uk-text-center" id="msgRetorno"> Opa! Alguma coisa não deu certo:</h4>
+          <ul>
+            <li *ngFor="let error of errors">{{ error.message }}</li>
+          </ul>
+        </div>
+
+        <div class="uk-margin">
+          <input class="uk-input uk-form-large" formControlName="nome" type="text" placeholder="Nome"
+            [ngClass]="{'uk-form-danger': (!form.controls.nome.valid && !form.controls.nome.pristine) }">
+        </div>
+        <div class="uk-margin">
+          <input class="uk-input uk-form-large" formControlName="email" type="email" placeholder="E-mail"
+            [ngClass]="{'uk-form-danger': (!form.controls.email.valid && !form.controls.email.pristine) }">
+        </div>
+        <div class="uk-margin">
+          <input class="uk-input uk-form-large" formControlName="telefone" type="text" placeholder="Telefone"
+            [ngClass]="{'uk-form-danger': (!form.controls.telefone.valid && !form.controls.telefone.pristine) }">
+        </div>
+
+        <div class="uk-margin">
+          <div uk-form-custom="target: > * > span:first-child" class="uk-select uk-form-large">
+            <select formControlName="sexo" [ngClass]="{'uk-form-danger': (!form.controls.sexo.valid) }">
+              <option value="">Selecione o sexo...</option>
+              <option value="M">Masculino</option>
+              <option value="F">Feminino</option>
+            </select>
+            <button class="uk-button uk-button-default" type="button">
+              <span></span>
+              <span uk-icon="icon: user"></span>
+            </button>
+          </div>
+        </div>
+
+        <div class="uk-margin">
+          <div uk-form-custom="target: > * > span:first-child" class="uk-select uk-form-large">
+            <select (change)="getGrupos($event.target.value)" formControlName="congregacaoId"
+              [ngClass]="{'uk-form-danger': (!form.controls.congregacaoId.valid) }">
+              <option value="">Selecione a congregação...</option>
+              <option *ngFor="let congregacao of congregacoes" value="{{congregacao.codigo}}">{{ congregacao.nome }}
+              </option>
+            </select>
+            <button class="uk-button uk-button-default" type="button">
+              <span></span>
+              <span uk-icon="icon: location"></span>
+            </button>
+          </div>
+        </div>
+
+        <div class="uk-margin">
+          <div uk-form-custom="target: > * > span:first-child" class="uk-select uk-form-large">
+            <select formControlName="grupoId" [ngClass]="{'uk-form-danger': (!form.controls.grupoId.valid) }">
+              <option value="">Selecione o grupo de campo...</option>
+              <option *ngFor="let grupo of grupos" value="{{grupo.codigo}}">{{ grupo.nome }}</option>
+            </select>
+            <button class="uk-button uk-button-default" type="button">
+              <span></span>
+              <span uk-icon="icon: users"></span>
+            </button>
+          </div>
+        </div>
+
+        <div class="uk-margin uk-grid-small uk-child-width-auto uk-grid">
+          <label><input class="uk-checkbox" type="checkbox" formControlName="leitorsentinela" unchecked> Leitor
+            Sentin.</label>
+          <label><input class="uk-checkbox" type="checkbox" formControlName="leitorestudolivro" unchecked> Leitor
+            Estudo</label>
+          <label><input class="uk-checkbox" type="checkbox" formControlName="indicador" unchecked> Indicador</label>
+        </div>
+
+        <div class="uk-margin uk-grid-small uk-child-width-auto uk-grid">
+          <label><input class="uk-checkbox" type="checkbox" formControlName="oracaofinal" unchecked> Oração
+            Final</label>
+          <label><input class="uk-checkbox" type="checkbox" formControlName="microfonista" unchecked>
+            Microfonista</label>
+          <label><input class="uk-checkbox" type="checkbox" formControlName="sistemasonoro" unchecked> Sistema
+            Sonoro</label>
+        </div>
+
+        <div class="uk-margin uk-grid-small uk-child-width-auto uk-grid">
+          <label><input class="uk-checkbox" type="checkbox" formControlName="presidenteconferencia" unchecked>
+            Presidente Conf.</label>
+          <label><input class="uk-checkbox" type="checkbox" formControlName="carrinho" unchecked> Carrinho</label>
+          <label><input class="uk-checkbox" type="checkbox" formControlName="acessoadmin" unchecked> Acesso
+            Administrador</label>
+        </div>
+
+        <div class="uk-margin uk-grid-small uk-child-width-auto uk-grid">
+          <label><input class="uk-checkbox" type="checkbox" formControlName="subirQuadro" unchecked>
+            Atualizar Quadro</label>
+          <label><input class="uk-checkbox" type="checkbox" formControlName="atualizarAssistencia" unchecked> Atualizar
+            Assistência</label>
+        </div>
+
+
+        <div class="uk-margin uk-text-right">
+          <button class="uk-button uk-button-default" [disabled]="form.invalid" (click)="submit()">Salvar</button>
+        </div>
+
+        <p class="uk-text-center">
+          <button (click)="changeMode('list')" class="uk-button uk-button-link">Cancelar</button>
+        </p>
+      </div>
+    </form>
+  </div>
+</div>

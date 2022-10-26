@@ -1,0 +1,20 @@
+<div class="uk-container uk-container-large uk-margin-top">
+  <nav class="uk-navbar-container" uk-navbar>
+      <div class="uk-navbar-right">
+          <ul class="uk-navbar-nav">
+              <li class="uk-active"><a href="/">
+                      <span class="uk-icon uk-margin-small-right" uk-icon="icon: thumbnails; ratio: 1.4"></span>
+                      Voltar ao Quadro
+                  </a></li>
+                  <li class="uk-active"><a [routerLink]="['/assistencia']">
+                    <span class="uk-icon uk-margin-small-right" uk-icon="icon: history; ratio: 1.4"></span>
+                    Voltar para Assistências
+                </a></li>
+
+          </ul>
+      </div>
+  </nav>
+  <div class="uk-overflow-auto">
+    <app-monthly-assistance-chart></app-monthly-assistance-chart>
+  </div>
+</div>

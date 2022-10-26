@@ -1,0 +1,139 @@
+<div class="uk-container uk-container-expand uk-margin-top ">
+  
+  <nav class="uk-navbar-container" uk-navbar>
+    <div class="uk-navbar-left">
+      <ul class="uk-navbar-nav uk-margin-bottom">
+        <li class="uk-active">GRUPOS DE CAMPO</li>
+      </ul>
+    </div>
+    <div class="uk-navbar-right" *ngIf="!busy">
+      <ul class="uk-navbar-nav">
+        <li *ngIf="user?.admin && !busy && mode=='list'" class="uk-active"><a (click)="changeMode('add')"><span
+              class="uk-icon uk-margin-small-right" uk-icon="icon: plus"></span>
+            Adicionar</a></li>
+            <li *ngIf="!user?.admin && !busy && mode=='list'" class="uk-active"><a href="/">
+              <span class="uk-icon uk-margin-small-right" uk-icon="icon: thumbnails; ratio: 1.4"></span>
+              Voltar ao Quadro
+          </a></li>
+      </ul>
+    </div>
+  </nav>
+  <app-loading *ngIf="busy"></app-loading>
+  <uL class="uk-child-width-1-3@s uk-overflow-auto" uk-grid *ngIf="mode=='list' && !busy">
+    <li *ngFor="let grupo of grupos ">
+      <div>
+        <div class="uk-card uk-card-default uk-card-hover uk-card-body">
+          <h3 class="uk-card-title uk-margin-remove-bottom"> {{grupo.nome}}</h3>
+          <div class="uk-text-meta uk-margin-remove-top"><b>Local:</b> {{grupo.local}}</div>
+          <div class="uk-text-meta uk-margin-remove-top"><b>Dirigente:</b> {{grupo.dirigente}}</div>
+          <button *ngIf="grupo.irmaos.length > 0" class="uk-button uk-button-default uk-button-large uk-width-1-1 uk-margin-top" uk-icon="icon: search"
+            (click)="setIrmaos(grupo)" href="#modal-sections" uk-toggle> Irmãos </button>
+          <button *ngIf="user?.admin" class="uk-button uk-button-primary uk-button-large uk-width-1-1 uk-margin-top"
+            uk-icon="icon: Pencil" (click)="edit(grupo)"> Alterar </button>
+          <button *ngIf="user?.admin" class="uk-button uk-button-danger uk-button-large uk-width-1-1 uk-margin-top"
+            uk-icon="icon: trash" (click)="configuraModelDelete(grupo)" href="#modal-apagar" uk-toggle> Remover
+          </button>
+
+        </div>
+      </div>
+  </uL>
+</div>
+
+<div class="uk-container" *ngIf="!busy && mode!='list'">
+    <div class="uk-width-1-2@m">
+        <form [formGroup]="form" >
+            <div class="uk-card uk-card-primary uk-card-body uk-box-shadow-small uk-margin">
+          
+              <div class="uk-form-danger" *ngIf="errors.length > 0">
+                <h4 class="uk-text-center" id="msgRetorno"> Opa! Alguma coisa não deu certo:</h4>
+                <ul>
+                  <li *ngFor="let error of errors">{{ error.message }}</li>
+                </ul>
+              </div>
+          
+              <div class="uk-margin">
+                <input class="uk-input uk-form-large" formControlName="nome" type="text" placeholder="Nome"
+                  [ngClass]="{'uk-form-danger': (!form.controls.nome.valid && !form.controls.nome.pristine) }">
+              </div>
+          
+              <div class="uk-margin">
+                <input class="uk-input uk-form-large" formControlName="local" type="text" placeholder="Local"
+                  [ngClass]="{'uk-form-danger': (!form.controls.local.valid && !form.controls.local.pristine) }">
+              </div>
+          
+              <div class="uk-margin">
+                  <div uk-form-custom="target: > * > span:first-child" class="uk-select uk-form-large">
+                    <select formControlName="dirigenteId" [ngClass]="{'uk-form-danger': (!form.controls.dirigenteId.valid) }">
+                      <option value="">Selecione o Dirigente...</option>
+                      <option *ngFor="let irmao of irmaos" value="{{irmao.codigo}}">{{ irmao.nome }}</option>
+                    </select>
+                    <button class="uk-button uk-button-default" type="button">
+                      <span></span>
+                      <span uk-icon="icon: user"></span>
+                    </button>
+                  </div>
+                </div>
+            
+              <div class="uk-margin uk-text-right">
+                <button class="uk-button uk-button-default" [disabled]="form.invalid" (click)="submit()">Salvar</button>
+              </div>
+          
+              <p class="uk-text-center">
+                <button (click)="changeMode('list')" class="uk-button uk-button-link">Cancelar</button>
+              </p>
+            </div>
+          </form>
+          
+    </div>
+</div>
+
+<div id="modal-sections" uk-modal>
+  <div class="uk-modal-dialog">
+    <button class="uk-modal-close-default" type="button" uk-close></button>
+    <div class="uk-modal-header">
+      <h2 class="uk-modal-title">{{grupocampo.nome}}</h2>
+    </div>
+    <ul class="uk-list uk-list-striped">
+
+      <li *ngFor="let reg of grupocampo.irmaos ">{{reg.irmao}}</li>
+    </ul>
+    <div class="uk-modal-footer uk-text-right">
+      <button class="uk-button uk-button-primary uk-modal-close" type="button">Fechar</button>
+    </div>
+  </div>
+</div>
+
+<div id="modal-apagar" uk-modal>
+  <div class="uk-modal-dialog">
+    <button class="uk-modal-close-default" type="button" uk-close></button>
+    <div class="uk-modal-header">
+      <h1 class="uk-modal-title">Para confirmar a remoção do grupo <b>{{grupocampo.nome}}</b> informe o novo grupo onde
+        serão transferidos os irmãos: </h1>
+    </div>
+    
+    <form [formGroup]="formDelete" *ngIf="!busy">
+      <div class="uk-card uk-card-small uk-card-body uk-box-shadow-small uk-margin">
+
+        <div class="uk-margin">
+          <div uk-form-custom="target: > * > span:first-child" class="uk-select uk-form-large">
+            <select formControlName="grupoId" [ngClass]="{'uk-form-danger': (!formDelete.controls.grupoId.valid) }">
+              <option value=""> Grupo de campo...</option>
+              <option *ngFor="let grupo of FilterGroupToDelete(grupos)" value="{{grupo.codigo}}">{{ grupo.nome }}
+              </option>
+            </select>
+            <button class="uk-button uk-button-default" type="button">
+              <span></span>
+              <span uk-icon="icon: users"></span>
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="uk-modal-footer uk-text-right">
+        <button class="uk-button uk-button-primary uk-modal-close" type="button">Voltar</button>
+        <button (click)="delete(grupocampo.codigo)" class="uk-button uk-button-danger uk-modal-close" type="button" [disabled]="formDelete.invalid"
+          >Ok</button>
+      </div>
+  
+    </form>
+  </div>
+</div>

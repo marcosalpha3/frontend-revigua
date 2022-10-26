@@ -1,0 +1,82 @@
+<div class="uk-container uk-container-expand uk-margin-top ">
+  <nav class="uk-navbar-container" uk-navbar>
+    <div class="uk-navbar-left">
+      <ul class="uk-navbar-nav uk-margin-bottom">
+        <li class="uk-active">QUADRO ANÚNCIOS</li>
+      </ul>
+    </div>
+    <div class="uk-navbar-right" *ngIf="!busy">
+      <ul class="uk-navbar-nav">
+
+        <li *ngIf="(user?.admin || user?.loadBoard)" class="uk-active"><a [routerLink]="['/novoquadro']"><span
+              class="uk-icon uk-margin-small-right" uk-icon="icon: cloud-upload"></span>
+            Adicionar</a></li>
+
+        <li *ngIf="user?.admin" class="uk-active"><a [routerLink]="['/evento']"><span
+              class="uk-icon uk-margin-small-right" uk-icon="icon: location"></span>
+            Eventos</a></li>
+
+      </ul>
+    </div>
+  </nav>
+  <app-loading *ngIf="busy"></app-loading>
+  <uL class="uk-child-width-1-3@s uk-overflow-auto" uk-grid *ngIf="!busy">
+    <li>
+      <div>
+        <div class="uk-card uk-card-default uk-card-hover uk-card-body">
+          <h3 class="uk-card-title">DESIGNAÇÕES MECÂNICAS</h3>
+          <button class="uk-button uk-button-primary uk-button-large uk-width-1-1" uk-icon="icon: search"
+            [routerLink]="['/designacao']" uk-toggle> Abrir </button>
+        </div>
+      </div>
+    </li>
+
+    <li>
+      <div>
+        <div class="uk-card uk-card-default uk-card-hover uk-card-body">
+          <h3 class="uk-card-title">ASSISTÊNCIAS REUNIÕES</h3>
+          <button class="uk-button uk-button-primary uk-button-large uk-width-1-1" uk-icon="icon: search"
+            [routerLink]="['/assistencia']" uk-toggle> Abrir </button>
+        </div>
+      </div>
+    </li>
+
+    <li>
+      <div>
+        <div class="uk-card uk-card-default uk-card-hover uk-card-body">
+          <h3 class="uk-card-title">GRUPOS DE CAMPO</h3>
+          <button class="uk-button uk-button-primary uk-button-large uk-width-1-1" uk-icon="icon: search"
+            [routerLink]="['/grupocampo']" uk-toggle> Abrir </button>
+        </div>
+      </div>
+    </li>
+
+    <li *ngFor="let quadro of quadros">
+      <div>
+        <div class="uk-card uk-card-default uk-card-hover uk-card-body">
+          <h3 class="uk-card-title">{{quadro.titulo.toUpperCase()}}</h3>
+          <button class="uk-button uk-button-primary uk-button-large uk-width-1-1" uk-icon="icon: search"
+            (click)="setImage(quadro.url)" href="#modal-media-image" uk-toggle> Abrir </button>
+          <button *ngIf="(user?.admin || user?.loadBoard)"
+            class="uk-button uk-button-danger uk-button-large uk-width-1-1 uk-margin-top" uk-icon="icon: trash"
+            (click)="setQuadro(quadro)" href="#modal-delete" uk-toggle> Remover </button>
+
+        </div>
+      </div>
+    </li>
+  </uL>
+  <app-modal-quadro-page [image]="image" [timeStamp]="timeStamp"></app-modal-quadro-page>
+
+  <!-- This is the modal -->
+  <div id="modal-delete" uk-modal>
+    <div class="uk-modal-dialog uk-modal-body">
+      <h2 class="uk-modal-title">Deseja mesmo excluir o quadro: <span class="uk-text-bold">{{board?.titulo}}</span> ?
+      </h2>
+      <p class="uk-text-right">
+        <button class="uk-button uk-button-default uk-modal-close" type="button">Cancelar</button>
+        <button class="uk-button uk-button-primary uk-modal-close" (click)="apagarQuadro()"
+          type="button">Confirma</button>
+      </p>
+    </div>
+  </div>
+</div>
